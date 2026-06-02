@@ -315,3 +315,71 @@ classify <- function(fasta_files,
 
   return(results)
 }
+
+#' Importar la tabla 'code' de la base de datos DuckDB
+#'
+#' Conecta a la base de datos DuckDB especificada y recupera la tabla de clasificaciones jerárquicas `code` en un R `data.frame`.
+#' Admite tanto el paquete `duckdb` de R como el ejecutable CLI `duckdb` de forma automática.
+#'
+#' @param db_path Carácter. Ruta a la base de datos DuckDB (`.db`).
+#' @param full_table Lógico. Si es `TRUE`, importa la tabla completa (incluyendo `signature` y las columnas `_state`). Si es `FALSE` (por defecto), solo importa las columnas `sample` y las columnas de índices (`_int`) y códigos completos (`_full`) de cada nivel.
+#' @return Un `data.frame` con los datos de la tabla `code`.
+#' @export
+get_code_table <- function(db_path, full_table = FALSE) {
+  if (missing(db_path) || is.null(db_path) || nchar(trimws(db_path)) == 0) {
+    stop("Debe especificar la ruta a la base de datos DuckDB ('db_path').")
+  }
+
+  if (!file.exists(db_path)) {
+    stop("La base de datos especificada no existe: ", db_path)
+  }
+
+  db_path <- normalizePath(db_path)
+
+  # 1. Intentar usar el paquete duckdb de R
+  if (requireNamespace("duckdb", quietly = TRUE) && requireNamespace("DBI", quietly = TRUE)) {
+    con <- DBI::dbConnect(duckdb::duckdb(), db_path, read_only = TRUE)
+    on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
+
+    all_cols <- DBI::dbListFields(con, "code")
+
+    if (full_table) {
+      cols_to_select <- all_cols
+    } else {
+      cols_to_select <- all_cols[all_cols == "sample" | grepl("_(int|full)$", all_cols)]
+    }
+
+    query <- sprintf("SELECT %s FROM code", paste(sprintf('"%s"', cols_to_select), collapse = ", "))
+    res <- DBI::dbGetQuery(con, query)
+    return(res)
+  }
+  # 2. Si no está disponible, intentar usar el ejecutable CLI de DuckDB
+  else if (Sys.which("duckdb") != "") {
+    col_query <- "PRAGMA table_info('code')"
+    col_info <- system2("duckdb", args = c(shQuote(db_path), "-csv", "-c", shQuote(col_query)), stdout = TRUE, stderr = FALSE)
+
+    if (length(col_info) > 0) {
+      df_cols <- read.csv(text = paste(col_info, collapse = "\n"), stringsAsFactors = FALSE)
+      all_cols <- df_cols$name
+
+      if (full_table) {
+        cols_to_select <- all_cols
+      } else {
+        cols_to_select <- all_cols[all_cols == "sample" | grepl("_(int|full)$", all_cols)]
+      }
+
+      select_query <- sprintf("SELECT %s FROM code", paste(sprintf('"%s"', cols_to_select), collapse = ", "))
+      csv_data <- system2("duckdb", args = c(shQuote(db_path), "-csv", "-c", shQuote(select_query)), stdout = TRUE, stderr = FALSE)
+
+      res <- read.csv(text = paste(csv_data, collapse = "\n"), stringsAsFactors = FALSE, check.names = FALSE)
+      return(res)
+    } else {
+      stop("No se pudieron obtener las columnas de la tabla 'code' usando el CLI de DuckDB.")
+    }
+  }
+  # 3. Lanzar error si no hay ninguna opción disponible
+  else {
+    stop("Para importar la tabla de clasificación, por favor instale el paquete 'duckdb' en R (install.packages('duckdb')) o asegúrese de que el ejecutable 'duckdb' está en el PATH de su sistema.")
+  }
+}
+

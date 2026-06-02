@@ -3,5 +3,6 @@
 export(classify)
 export(download_bactaxid)
 export(download_db)
+export(get_code_table)
 export(list_available_dbs)
 importFrom(jsonlite,fromJSON)

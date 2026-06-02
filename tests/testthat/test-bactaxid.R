@@ -39,3 +39,28 @@ test_that("classify validates input arguments", {
     "Debe especificar 'genus' o 'db_path' cuando se ejecuta en modo no interactivo"
   )
 })
+
+test_that("get_code_table validates input and reads data", {
+  expect_error(get_code_table(), "Debe especificar la ruta a la base de datos DuckDB")
+  expect_error(get_code_table("non_existent_db.db"), "La base de datos especificada no existe")
+
+  # Si existe Serratia.db localmente (de los tests de integración), verificamos la lectura
+  serratia_db <- "test_data/Serratia.db"
+  if (file.exists(serratia_db)) {
+    # Test importación reducida (por defecto)
+    df_reduced <- get_code_table(serratia_db, full_table = FALSE)
+    expect_s3_class(df_reduced, "data.frame")
+    expect_true("sample" %in% names(df_reduced))
+    expect_true("L_0_int" %in% names(df_reduced))
+    expect_true("L_0_full" %in% names(df_reduced))
+    expect_false("signature" %in% names(df_reduced))
+    expect_false("L_0_state" %in% names(df_reduced))
+
+    # Test importación completa
+    df_full <- get_code_table(serratia_db, full_table = TRUE)
+    expect_s3_class(df_full, "data.frame")
+    expect_true("signature" %in% names(df_full))
+    expect_true("L_0_state" %in% names(df_full))
+  }
+})
+
