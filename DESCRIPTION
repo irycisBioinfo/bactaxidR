@@ -14,7 +14,9 @@ RoxygenNote: 8.0.0
 Imports:
     jsonlite,
     utils,
-    tools
+    tools,
+    duckdb,
+    DBI
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
