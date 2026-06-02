@@ -4,3 +4,5 @@
 .Rproj.user/
 .Rapp.history
 *.tar.gz
+test_data/
+
