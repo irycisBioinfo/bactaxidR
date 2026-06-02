@@ -1,0 +1,22 @@
+Package: bactaxidR
+Type: Package
+Title: Utilities for BacTaxID Bacterial Taxonomic Classification
+Version: 0.1.0
+Authors@R: c(
+    person("Val F.", "Lanza", email = "valflanza@gmail.com", role = c("aut", "cre")),
+    person("Miguel D.", "Fernández-de-Bobadilla", email = "miguel.fernandez@irycis.org", role = "aut"),
+    person("irycisBioinfo", role = c("cph", "fnd"))
+  )
+Description: Utilities to run bacterial genomic classification with BacTaxID, including automated downloading of the executable from GitHub and reference databases from Zenodo.
+License: GPL-3
+Encoding: UTF-8
+RoxygenNote: 8.0.0
+Imports:
+    jsonlite,
+    utils,
+    tools
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+Collate: 
+    'bactaxid.R'
