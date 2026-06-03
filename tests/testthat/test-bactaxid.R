@@ -76,17 +76,16 @@ test_that("classify output returns data.frame with class btx_cls", {
   }
 })
 
-test_that("plot_sunburst validates input and creates plotly widget", {
-  expect_error(plot_sunburst(NULL), "Must specify a valid data.frame")
-  expect_error(plot_sunburst(data.frame(x = 1)), "Input data.frame must contain columns ending in")
+test_that("plot_krona validates input and creates Krona iframe tag", {
+  expect_error(plot_krona(NULL), "Must specify a valid data.frame")
+  expect_error(plot_krona(data.frame(x = 1)), "Input data.frame must contain columns ending in")
 
   serratia_db <- testthat::test_path("../../test_data/Serratia.db")
   if (file.exists(serratia_db)) {
     # Test plotting from btx_code
     df_reduced <- get_code_table(serratia_db, full_table = FALSE)
-    p_code <- plot_sunburst(df_reduced)
-    expect_s3_class(p_code, "plotly")
-    expect_s3_class(p_code, "htmlwidget")
+    p_code <- plot_krona(df_reduced)
+    expect_s3_class(p_code, "shiny.tag")
 
     # Test plotting from btx_cls (using mock data frame)
     mock_cls <- data.frame(
@@ -95,9 +94,8 @@ test_that("plot_sunburst validates input and creates plotly widget", {
       stringsAsFactors = FALSE
     )
     class(mock_cls) <- c("btx_cls", "data.frame")
-    p_cls <- plot_sunburst(mock_cls)
-    expect_s3_class(p_cls, "plotly")
-    expect_s3_class(p_cls, "htmlwidget")
+    p_cls <- plot_krona(mock_cls)
+    expect_s3_class(p_cls, "shiny.tag")
   }
 })
 

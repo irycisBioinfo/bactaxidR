@@ -17,7 +17,7 @@ Imports:
     tools,
     duckdb,
     DBI,
-    plotly
+    KronaR
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
@@ -27,4 +27,7 @@ Collate:
     'download_db.R'
     'classify.R'
     'get_code_table.R'
-    'plot_sunburst.R'
+    'plot_krona.R'
+Remotes:
+    irycisBioinfo/KronaR
+

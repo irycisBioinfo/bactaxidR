@@ -7,7 +7,7 @@ The package includes:
 - Helper functions to download and decompress reference DuckDB database files for specific genera from Zenodo ([17791772](https://zenodo.org/records/17791772)).
 - A `classify` function to perform taxonomic classification on a set of FASTA files interactively or non-interactively, returning a structured R `data.frame` of S3 class `btx_cls`.
 - A `get_code_table` function to import the reference classification table from DuckDB database files, returning an R `data.frame` of S3 class `btx_code`.
-- A `plot_sunburst` function to generate an interactive Plotly sunburst chart representing the hierarchical structure and frequencies of taxonomic codes from either database references or classification outputs.
+- A `plot_krona` function to generate an interactive Krona chart representing the hierarchical structure and frequencies of taxonomic codes from either database references or classification outputs using `KronaR`.
 
 ---
 
@@ -111,19 +111,19 @@ The returned data frame inherits the custom `btx_code` S3 class, allowing for ea
 
 ---
 
-### 5. Plot Interactive Sunburst Chart (`plot_sunburst`)
+### 5. Plot Interactive Krona Chart (`plot_krona`)
 
-You can visualize the frequency and hierarchical distribution of taxonomic classifications (either reference tables from `get_code_table` or classification outputs from `classify`):
+You can visualize the frequency and hierarchical distribution of taxonomic classifications (either reference tables from `get_code_table` or classification outputs from `classify`) using Krona:
 
 ```R
-# Plot the interactive sunburst using Plotly
-fig <- plot_sunburst(code_table, root_label = "Serratia")
+# Plot the interactive Krona chart
+fig <- plot_krona(code_table, root_label = "Serratia")
 
-# Render the interactive plot in RStudio or your web browser
+# Render the interactive plot in RStudio Viewer or your web browser
 fig
 ```
 
-The resulting sunburst chart allows for interactive navigation by clicking on internal sectors to zoom in on sub-levels and view frequencies.
+The resulting interactive chart allows you to dynamically zoom, query, and explore the classification hierarchy.
 
 ---
 
