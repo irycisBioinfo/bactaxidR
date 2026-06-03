@@ -15,18 +15,18 @@ test_that("list_available_dbs returns valid genera", {
 })
 
 test_that("download_db validates genus and throws error if invalid", {
-  expect_error(download_db(""), "Debe especificar un género bacteriano")
-  expect_error(download_db(NULL), "Debe especificar un género bacteriano")
-  expect_error(download_db("InvalidGenusNameThatDoesNotExist123"), "no está disponible en las bases de datos de Zenodo")
+  expect_error(download_db(""), "Must specify a bacterial genus")
+  expect_error(download_db(NULL), "Must specify a bacterial genus")
+  expect_error(download_db("InvalidGenusNameThatDoesNotExist123"), "is not available in the Zenodo databases")
 })
 
 test_that("classify validates input arguments", {
   # Error when fasta_files is missing
-  expect_error(classify(), "Debe especificar al menos un archivo FASTA de entrada")
-  expect_error(classify(character(0)), "Debe especificar al menos un archivo FASTA de entrada")
+  expect_error(classify(), "Must specify at least one input FASTA file")
+  expect_error(classify(character(0)), "Must specify at least one input FASTA file")
 
   # Error when files do not exist
-  expect_error(classify("non_existent_file_xyz.fasta"), "El archivo FASTA no existe")
+  expect_error(classify("non_existent_file_xyz.fasta"), "FASTA file does not exist")
 
   # Error in non-interactive mode when genus and db_path are NULL
   # Create a dummy fasta file to pass the first check
@@ -36,19 +36,20 @@ test_that("classify validates input arguments", {
 
   expect_error(
     classify(dummy_fasta, genus = NULL, db_path = NULL),
-    "Debe especificar 'genus' o 'db_path' cuando se ejecuta en modo no interactivo"
+    "Must specify 'genus' or 'db_path' when running in non-interactive mode"
   )
 })
 
 test_that("get_code_table validates input and reads data", {
-  expect_error(get_code_table(), "Debe especificar la ruta a la base de datos DuckDB")
-  expect_error(get_code_table("non_existent_db.db"), "La base de datos especificada no existe")
+  expect_error(get_code_table(), "Must specify the path to the DuckDB database")
+  expect_error(get_code_table("non_existent_db.db"), "The specified database does not exist")
 
-  # Si existe Serratia.db localmente (de los tests de integración), verificamos la lectura
-  serratia_db <- "test_data/Serratia.db"
+  # If Serratia.db exists locally, verify reading and S3 class btx_code
+  serratia_db <- testthat::test_path("../../test_data/Serratia.db")
   if (file.exists(serratia_db)) {
-    # Test importación reducida (por defecto)
+    # Test reduced import (default)
     df_reduced <- get_code_table(serratia_db, full_table = FALSE)
+    expect_s3_class(df_reduced, "btx_code")
     expect_s3_class(df_reduced, "data.frame")
     expect_true("sample" %in% names(df_reduced))
     expect_true("L_0_int" %in% names(df_reduced))
@@ -56,11 +57,21 @@ test_that("get_code_table validates input and reads data", {
     expect_false("signature" %in% names(df_reduced))
     expect_false("L_0_state" %in% names(df_reduced))
 
-    # Test importación completa
+    # Test full import
     df_full <- get_code_table(serratia_db, full_table = TRUE)
+    expect_s3_class(df_full, "btx_code")
     expect_s3_class(df_full, "data.frame")
     expect_true("signature" %in% names(df_full))
     expect_true("L_0_state" %in% names(df_full))
   }
 })
 
+test_that("classify output returns data.frame with class btx_cls", {
+  serratia_db <- testthat::test_path("../../test_data/Serratia.db")
+  test_fasta <- list.files(testthat::test_path("../../test_data"), pattern = "\\.fna$", full.names = TRUE)[1]
+  if (file.exists(serratia_db) && !is.na(test_fasta) && file.exists(test_fasta)) {
+    res_cls <- classify(test_fasta, db_path = serratia_db, verbose = FALSE)
+    expect_s3_class(res_cls, "btx_cls")
+    expect_s3_class(res_cls, "data.frame")
+  }
+})
