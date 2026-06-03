@@ -16,7 +16,8 @@ Imports:
     utils,
     tools,
     duckdb,
-    DBI
+    DBI,
+    plotly
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
@@ -26,3 +27,4 @@ Collate:
     'download_db.R'
     'classify.R'
     'get_code_table.R'
+    'plot_sunburst.R'
