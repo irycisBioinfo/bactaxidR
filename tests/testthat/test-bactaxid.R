@@ -90,8 +90,8 @@ test_that("plot_krona validates input, creates Krona iframe tag or static PNG", 
     # Test static snapshot from btx_code (non-interactive mode)
     temp_png <- tempfile(fileext = ".png")
     on.exit(unlink(temp_png), add = TRUE)
-    snap_path <- plot_krona(df_reduced, interactive = FALSE, file = temp_png)
-    expect_equal(snap_path, temp_png)
+    res_obj <- plot_krona(df_reduced, interactive = FALSE, file = temp_png)
+    expect_s3_class(res_obj, "ggplot")
     expect_true(file.exists(temp_png))
 
     # Test plotting from btx_cls (using mock data frame)

@@ -6,11 +6,11 @@
 #' @param df A data.frame of class `btx_code` (from `get_code_table()`) or `btx_cls` (from `classify()`).
 #' @param root_label Character. Label for the center/root node of the Krona chart. Defaults to `"Total"`.
 #' @param interactive Logical. If `TRUE` (default), returns an interactive htmltools tag object (iframe).
-#'   If `FALSE`, generates a static PNG snapshot and returns its file path.
+#'   If `FALSE`, generates a static PNG snapshot and returns a ggplot object representing it.
 #' @param file Character. Optional file path to save the static PNG snapshot when `interactive = FALSE`. If `NULL`, a temporary file path is generated.
 #' @param ... Additional arguments passed to `KronaR::kronar_plot` (if `interactive = TRUE`) or `KronaR::kronar_snapshot` (if `interactive = FALSE`).
 #' @return If `interactive = TRUE`, an htmltools tag object (iframe) displaying the interactive Krona chart.
-#'   If `interactive = FALSE`, the character file path where the static PNG snapshot was saved.
+#'   If `interactive = FALSE`, a ggplot object (or file path if magick/ggplot2 are not available) representing the static chart.
 #' @export
 #' @importFrom KronaR kronar_plot kronar_snapshot
 plot_krona <- function(df, root_label = "Total", interactive = TRUE, file = NULL, ...) {
@@ -75,46 +75,15 @@ plot_krona <- function(df, root_label = "Total", interactive = TRUE, file = NULL
       root_name = root_label,
       ...
     )
-    return(p)
   } else {
-    # Generate static snapshot
-    if (is.null(file)) {
-      file <- tempfile(fileext = ".png")
-    }
-
-    snap_path <- tryCatch({
-      KronaR::kronar_snapshot(
-        df = df_levels,
-        file = file,
-        count_col = "Count",
-        root_name = root_label,
-        ...
-      )
-    }, error = function(e) {
-      msg <- e$message
-      if (grepl("chrome|chromium|google-chrome", tolower(msg))) {
-        stop(paste0(
-          "Chrome/Chromium executable not found. The 'webshot2' package requires a Chromium-based browser to take snapshots.\n",
-          "Please install Google Chrome or Chromium on your system:\n",
-          "  - Ubuntu/Debian: sudo apt-get update && sudo apt-get install -y chromium-browser\n",
-          "  - macOS: brew install --cask google-chrome\n",
-          "  - Windows: Install Google Chrome\n",
-          "Original error: ", msg
-        ), call. = FALSE)
-      } else {
-        stop(e)
-      }
-    })
-
-    # Read and plot the PNG to the current graphics device
-    if (requireNamespace("png", quietly = TRUE)) {
-      img <- png::readPNG(snap_path)
-      grid::grid.newpage()
-      grid::grid.raster(img)
-    } else {
-      warning("The 'png' package is not installed. Unable to render the snapshot to the Plots pane.")
-    }
-
-    return(invisible(snap_path))
+    p <- KronaR::kronar_snapshot(
+      df = df_levels,
+      file = file,
+      count_col = "Count",
+      root_name = root_label,
+      ...
+    )
   }
+
+  return(p)
 }

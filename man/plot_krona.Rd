@@ -12,7 +12,7 @@ plot_krona(df, root_label = "Total", interactive = TRUE, file = NULL, ...)
 \item{root_label}{Character. Label for the center/root node of the Krona chart. Defaults to `"Total"`.}
 
 \item{interactive}{Logical. If `TRUE` (default), returns an interactive htmltools tag object (iframe).
-If `FALSE`, generates a static PNG snapshot and returns its file path.}
+If `FALSE`, generates a static PNG snapshot and returns a ggplot object representing it.}
 
 \item{file}{Character. Optional file path to save the static PNG snapshot when `interactive = FALSE`. If `NULL`, a temporary file path is generated.}
 
@@ -20,7 +20,7 @@ If `FALSE`, generates a static PNG snapshot and returns its file path.}
 }
 \value{
 If `interactive = TRUE`, an htmltools tag object (iframe) displaying the interactive Krona chart.
-  If `interactive = FALSE`, the character file path where the static PNG snapshot was saved.
+  If `interactive = FALSE`, a ggplot object (or file path if magick/ggplot2 are not available) representing the static chart.
 }
 \description{
 Generates an interactive Krona chart or a static PNG snapshot representing the hierarchical
