@@ -1,24 +1,26 @@
 # bactaxidR
 
-`bactaxidR` es un paquete de R con utilidades para facilitar el uso de [BacTaxID](https://github.com/irycisBioinfo/BacTaxID), un sistema universal de tipado bacteriano basado en genomas. 
+`bactaxidR` is an R package containing utilities to facilitate the use of [BacTaxID](https://github.com/irycisBioinfo/BacTaxID), a universal bacterial genomic classification system.
 
-El paquete incluye:
-- El ejecutable compatible de `bactaxid` compilado para Linux integrado directamente en el paquete.
-- Funciones para descargar y descomprimir de forma nativa las bases de datos DuckDB de géneros específicos publicadas en Zenodo ([17791772](https://zenodo.org/records/17791772)).
-- Una función `classify` para realizar análisis taxonómico de un conjunto de archivos FASTA de forma interactiva o no interactiva, devolviendo un `data.frame` de R estructurado.
+The package includes:
+- A precompiled, compatible `bactaxid` executable for Linux bundled directly inside the package (`inst/bin/bactaxid`).
+- Helper functions to download and decompress reference DuckDB database files for specific genera from Zenodo ([17791772](https://zenodo.org/records/17791772)).
+- A `classify` function to perform taxonomic classification on a set of FASTA files interactively or non-interactively, returning a structured R `data.frame` of S3 class `btx_cls`.
+- A `get_code_table` function to import the reference classification table from DuckDB database files, returning an R `data.frame` of S3 class `btx_code`.
+- A `plot_sunburst` function to generate an interactive Plotly sunburst chart representing the hierarchical structure and frequencies of taxonomic codes from either database references or classification outputs.
 
 ---
 
-## Instalación
+## Installation
 
-Puedes instalar `bactaxidR` localmente en tu sistema desde el directorio del paquete usando:
+You can install `bactaxidR` locally from the package directory:
 
 ```R
-# En R:
-# devtools::install_local("ruta/a/bactaxidR")
+# In R:
+# devtools::install_local("path/to/bactaxidR")
 ```
 
-O instalándolo directamente desde el código fuente o tarball en la terminal:
+Or directly from source using the terminal:
 
 ```bash
 R CMD INSTALL bactaxidR
@@ -26,88 +28,92 @@ R CMD INSTALL bactaxidR
 
 ---
 
-## Uso Básico
+## Basic Usage
 
-### 1. Listar bases de datos disponibles
+### 1. List Available Databases
 
-Puedes listar todos los géneros bacterianos que tienen bases de datos de referencia oficiales en Zenodo:
+You can list all bacterial genera that have official reference databases on Zenodo:
 
 ```R
 library(bactaxidR)
 
-# Consulta la API de Zenodo para obtener la lista actualizada
-generos <- list_available_dbs()
-print(generos)
+# Query the Zenodo API for the latest list of available genera
+genera <- list_available_dbs()
+print(genera)
 ```
 
-### 2. Descargar base de datos para un género
+### 2. Download Database for a Genus
 
-Para descargar la base de datos DuckDB de un género (por ejemplo, *Escherichia* o *Salmonella*), la cual se descargará comprimida y se descomprimirá en el directorio de datos del usuario de forma automática:
+To download the reference database for a genus (e.g. *Escherichia* or *Salmonella*), which will be downloaded compressed and automatically uncompressed into the user data directory:
 
 ```R
-# Descargar base de datos
+# Download database
 db_path <- download_db(genus = "Escherichia")
-message("Base de datos guardada en: ", db_path)
+message("Database saved at: ", db_path)
 ```
 
-### 3. Clasificar Genomas (FASTA)
+### 3. Classify Genomes (FASTA)
 
-La función `classify` toma un vector de archivos FASTA, valida la presencia de la base de datos y del ejecutable, realiza la búsqueda jerárquica de BacTaxID y retorna un data.frame con los resultados.
+The `classify` function takes a vector of FASTA file paths, validates the presence of the database and executable, runs the BacTaxID hierarchical classification, and returns a data frame with the results of class `btx_cls`.
 
-Si no se especifica el parámetro `genus` ni `db_path`, y te encuentras en una sesión interactiva, el paquete te solicitará de forma interactiva que introduzcas el género deseado:
+If `genus` and `db_path` are not specified and you are in an interactive session, the package will prompt you to enter the genus:
 
 ```R
-# Rutas a tus genomas FASTA
-mis_genomas <- c("sample1.fasta", "sample2.fna")
+# Paths to your FASTA genomes
+my_genomes <- c("sample1.fasta", "sample2.fna")
 
-# Clasificación
-resultados <- classify(
-  fasta_files = mis_genomas,
+# Run classification
+results <- classify(
+  fasta_files = my_genomes,
   genus = "Escherichia"
 )
 
-# Visualizar la clasificación en un data.frame
-print(resultados)
+# Print classification results data frame
+print(results)
 ```
 
-Las columnas devueltas en el `data.frame` corresponden a los resultados del motor DuckDB de BacTaxID:
-- `query_id`: Identificador del genoma consultado.
-- `query_signature`: Firma calculada para la query.
-- `best_hit_id`: Identificador de la mejor coincidencia de referencia.
-- `best_hit_signature`: Firma de la mejor coincidencia.
-- `similarity_score`: Nivel de similitud estimado (basado en ANI).
-- `levels_reached`: Profundidad/niveles jerárquicos alcanzados en la clasificación.
-- `final_code`: Código taxonómico jerárquico asignado (ej. `1.3.1.8.12.1`).
-- `best_hit_code`: Código taxonómico jerárquico del mejor hit.
-
-### 4. Obtener Tabla de Códigos de Referencia (`get_code_table`)
-
-Puedes importar la tabla completa de códigos taxonómicos de referencia jerárquicos desde la base de datos DuckDB de cualquier género:
-
-```R
-# Obtener la tabla reducida (solo sample y códigos de niveles L_0 a L_5)
-tabla_codigos <- get_code_table("test_data/Serratia.db", full_table = FALSE)
-print(head(tabla_codigos))
-```
-
-El data.frame devuelto tiene la clase personalizada `btx_code`, lo que permite identificarlo fácilmente en flujos analíticos.
-
-### 5. Graficar Gráfico Interactivo Sunburst (`plot_sunburst`)
-
-Puedes visualizar de forma interactiva la frecuencia y distribución jerárquica de las clasificaciones taxonómicas (ya sean referencias obtenidas con `get_code_table` o resultados de clasificación obtenidos con `classify`):
-
-```R
-# Graficar el sunburst interactivo usando Plotly
-grafico <- plot_sunburst(tabla_codigos, root_label = "Serratia")
-
-# Renderizar el gráfico interactivo en RStudio o tu navegador
-grafico
-```
-
-El gráfico sunburst resultante permite navegar de forma interactiva haciendo clic en los sectores jerárquicos internos para explorar sub-niveles y ver las proporciones y abundancias correspondientes.
+The returned `data.frame` columns correspond to the BacTaxID DuckDB engine results:
+- `query_id`: Identifier of the queried genome.
+- `query_signature`: Computed query signature.
+- `best_hit_id`: Identifier of the best matching reference genome.
+- `best_hit_signature`: Signature of the best match.
+- `similarity_score`: Estimated similarity score (based on ANI).
+- `levels_reached`: Taxonomic depth/levels reached during classification.
+- `final_code`: Assigned hierarchical taxonomic code (e.g., `1.3.1.8.12.1`).
+- `best_hit_code`: Hierarchical taxonomic code of the best hit.
 
 ---
 
-## Licencia
+### 4. Get Reference Code Table (`get_code_table`)
 
-Este paquete está licenciado bajo los términos de la licencia GPL-3.
+You can import the full table of hierarchical reference classification codes from a genus-specific DuckDB database:
+
+```R
+# Get the reduced table (only sample and L_0 to L_5 level codes)
+code_table <- get_code_table("test_data/Serratia.db", full_table = FALSE)
+print(head(code_table))
+```
+
+The returned data frame inherits the custom `btx_code` S3 class, allowing for easy identification in analytical workflows.
+
+---
+
+### 5. Plot Interactive Sunburst Chart (`plot_sunburst`)
+
+You can visualize the frequency and hierarchical distribution of taxonomic classifications (either reference tables from `get_code_table` or classification outputs from `classify`):
+
+```R
+# Plot the interactive sunburst using Plotly
+fig <- plot_sunburst(code_table, root_label = "Serratia")
+
+# Render the interactive plot in RStudio or your web browser
+fig
+```
+
+The resulting sunburst chart allows for interactive navigation by clicking on internal sectors to zoom in on sub-levels and view frequencies.
+
+---
+
+## License
+
+This package is licensed under the GPL-3 License.
