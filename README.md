@@ -13,7 +13,20 @@ The package includes:
 
 ## Installation
 
-You can install `bactaxidR` locally from the package directory:
+You can install the development version of `bactaxidR` directly from GitHub using `devtools` or `remotes`:
+
+```R
+# Install devtools or remotes if needed
+# install.packages("devtools")
+# install.packages("remotes")
+
+# Install bactaxidR from GitHub
+devtools::install_github("irycisBioinfo/bactaxidR")
+# or
+remotes::install_github("irycisBioinfo/bactaxidR")
+```
+
+Alternatively, you can install `bactaxidR` locally from the package directory:
 
 ```R
 # In R:
@@ -23,7 +36,7 @@ You can install `bactaxidR` locally from the package directory:
 Or directly from source using the terminal:
 
 ```bash
-R CMD INSTALL bactaxidR
+R CMD INSTALL .
 ```
 
 ---
