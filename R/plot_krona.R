@@ -1,15 +1,19 @@
 #' Plot hierarchical Krona chart of taxonomic classifications
 #'
-#' Generates an interactive Krona chart representing the hierarchical structure and
-#' frequency of each taxonomic level from a BacTaxID code table (`btx_code`) or classification results (`btx_cls`).
+#' Generates an interactive Krona chart or a static PNG snapshot representing the hierarchical
+#' structure and frequency of each taxonomic level from a BacTaxID code table (`btx_code`) or classification results (`btx_cls`).
 #'
 #' @param df A data.frame of class `btx_code` (from `get_code_table()`) or `btx_cls` (from `classify()`).
 #' @param root_label Character. Label for the center/root node of the Krona chart. Defaults to `"Total"`.
-#' @param ... Additional arguments passed to `KronaR::kronar_plot`.
-#' @return An htmltools tag object (iframe) displaying the interactive Krona chart.
+#' @param interactive Logical. If `TRUE` (default), returns an interactive htmltools tag object (iframe).
+#'   If `FALSE`, generates a static PNG snapshot and returns its file path.
+#' @param file Character. Optional file path to save the static PNG snapshot when `interactive = FALSE`. If `NULL`, a temporary file path is generated.
+#' @param ... Additional arguments passed to `KronaR::kronar_plot` (if `interactive = TRUE`) or `KronaR::kronar_snapshot` (if `interactive = FALSE`).
+#' @return If `interactive = TRUE`, an htmltools tag object (iframe) displaying the interactive Krona chart.
+#'   If `interactive = FALSE`, the character file path where the static PNG snapshot was saved.
 #' @export
-#' @importFrom KronaR kronar_plot
-plot_krona <- function(df, root_label = "Total", ...) {
+#' @importFrom KronaR kronar_plot kronar_snapshot
+plot_krona <- function(df, root_label = "Total", interactive = TRUE, file = NULL, ...) {
   if (missing(df) || !is.data.frame(df)) {
     stop("Must specify a valid data.frame ('df').")
   }
@@ -64,12 +68,22 @@ plot_krona <- function(df, root_label = "Total", ...) {
   df_levels$Count <- 1
 
   # Call KronaR plotting function
-  p <- KronaR::kronar_plot(
-    df = df_levels,
-    count_col = "Count",
-    root_name = root_label,
-    ...
-  )
+  if (interactive) {
+    p <- KronaR::kronar_plot(
+      df = df_levels,
+      count_col = "Count",
+      root_name = root_label,
+      ...
+    )
+  } else {
+    p <- KronaR::kronar_snapshot(
+      df = df_levels,
+      file = file,
+      count_col = "Count",
+      root_name = root_label,
+      ...
+    )
+  }
 
   return(p)
 }

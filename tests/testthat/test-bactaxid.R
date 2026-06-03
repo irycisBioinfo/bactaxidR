@@ -76,16 +76,23 @@ test_that("classify output returns data.frame with class btx_cls", {
   }
 })
 
-test_that("plot_krona validates input and creates Krona iframe tag", {
+test_that("plot_krona validates input, creates Krona iframe tag or static PNG", {
   expect_error(plot_krona(NULL), "Must specify a valid data.frame")
   expect_error(plot_krona(data.frame(x = 1)), "Input data.frame must contain columns ending in")
 
   serratia_db <- testthat::test_path("../../test_data/Serratia.db")
   if (file.exists(serratia_db)) {
-    # Test plotting from btx_code
+    # Test plotting from btx_code (interactive mode)
     df_reduced <- get_code_table(serratia_db, full_table = FALSE)
-    p_code <- plot_krona(df_reduced)
+    p_code <- plot_krona(df_reduced, interactive = TRUE)
     expect_s3_class(p_code, "shiny.tag")
+
+    # Test static snapshot from btx_code (non-interactive mode)
+    temp_png <- tempfile(fileext = ".png")
+    on.exit(unlink(temp_png), add = TRUE)
+    snap_path <- plot_krona(df_reduced, interactive = FALSE, file = temp_png)
+    expect_equal(snap_path, temp_png)
+    expect_true(file.exists(temp_png))
 
     # Test plotting from btx_cls (using mock data frame)
     mock_cls <- data.frame(
@@ -94,7 +101,7 @@ test_that("plot_krona validates input and creates Krona iframe tag", {
       stringsAsFactors = FALSE
     )
     class(mock_cls) <- c("btx_cls", "data.frame")
-    p_cls <- plot_krona(mock_cls)
+    p_cls <- plot_krona(mock_cls, interactive = TRUE)
     expect_s3_class(p_cls, "shiny.tag")
   }
 })

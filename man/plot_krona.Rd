@@ -4,19 +4,25 @@
 \alias{plot_krona}
 \title{Plot hierarchical Krona chart of taxonomic classifications}
 \usage{
-plot_krona(df, root_label = "Total", ...)
+plot_krona(df, root_label = "Total", interactive = TRUE, file = NULL, ...)
 }
 \arguments{
 \item{df}{A data.frame of class `btx_code` (from `get_code_table()`) or `btx_cls` (from `classify()`).}
 
 \item{root_label}{Character. Label for the center/root node of the Krona chart. Defaults to `"Total"`.}
 
-\item{...}{Additional arguments passed to `KronaR::kronar_plot`.}
+\item{interactive}{Logical. If `TRUE` (default), returns an interactive htmltools tag object (iframe).
+If `FALSE`, generates a static PNG snapshot and returns its file path.}
+
+\item{file}{Character. Optional file path to save the static PNG snapshot when `interactive = FALSE`. If `NULL`, a temporary file path is generated.}
+
+\item{...}{Additional arguments passed to `KronaR::kronar_plot` (if `interactive = TRUE`) or `KronaR::kronar_snapshot` (if `interactive = FALSE`).}
 }
 \value{
-An htmltools tag object (iframe) displaying the interactive Krona chart.
+If `interactive = TRUE`, an htmltools tag object (iframe) displaying the interactive Krona chart.
+  If `interactive = FALSE`, the character file path where the static PNG snapshot was saved.
 }
 \description{
-Generates an interactive Krona chart representing the hierarchical structure and
-frequency of each taxonomic level from a BacTaxID code table (`btx_code`) or classification results (`btx_cls`).
+Generates an interactive Krona chart or a static PNG snapshot representing the hierarchical
+structure and frequency of each taxonomic level from a BacTaxID code table (`btx_code`) or classification results (`btx_cls`).
 }

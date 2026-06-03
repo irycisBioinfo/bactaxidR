@@ -7,7 +7,7 @@ The package includes:
 - Helper functions to download and decompress reference DuckDB database files for specific genera from Zenodo ([17791772](https://zenodo.org/records/17791772)).
 - A `classify` function to perform taxonomic classification on a set of FASTA files interactively or non-interactively, returning a structured R `data.frame` of S3 class `btx_cls`.
 - A `get_code_table` function to import the reference classification table from DuckDB database files, returning an R `data.frame` of S3 class `btx_code`.
-- A `plot_krona` function to generate an interactive Krona chart representing the hierarchical structure and frequencies of taxonomic codes from either database references or classification outputs using `KronaR`.
+- A `plot_krona` function to generate an interactive Krona chart (iframe) or a static PNG snapshot representing the hierarchical structure and frequencies of taxonomic codes from either database references or classification outputs using `KronaR`.
 
 ---
 
@@ -111,19 +111,29 @@ The returned data frame inherits the custom `btx_code` S3 class, allowing for ea
 
 ---
 
-### 5. Plot Interactive Krona Chart (`plot_krona`)
+### 5. Plot Krona Chart (`plot_krona`)
 
-You can visualize the frequency and hierarchical distribution of taxonomic classifications (either reference tables from `get_code_table` or classification outputs from `classify`) using Krona:
+You can visualize the frequency and hierarchical distribution of taxonomic classifications (either reference tables from `get_code_table` or classification outputs from `classify`) using Krona.
+
+#### Interactive Mode (Default)
+By default, the function returns an interactive `shiny.tag` (iframe) widget suitable for RStudio Viewer or embedding in Shiny/Quarto:
 
 ```R
-# Plot the interactive Krona chart
-fig <- plot_krona(code_table, root_label = "Serratia")
-
-# Render the interactive plot in RStudio Viewer or your web browser
+# Generate and display the interactive Krona chart
+fig <- plot_krona(code_table, root_label = "Serratia", interactive = TRUE)
 fig
 ```
 
-The resulting interactive chart allows you to dynamically zoom, query, and explore the classification hierarchy.
+#### Static Snapshot Mode
+You can also generate a static PNG snapshot of the Krona chart (which uses `webshot2` under the hood):
+
+```R
+# Generate and save a static PNG snapshot
+png_path <- plot_krona(code_table, root_label = "Serratia", interactive = FALSE, file = "krona_snapshot.png")
+message("Snapshot saved to: ", png_path)
+```
+
+The resulting interactive chart allows you to dynamically zoom, query, and explore the classification hierarchy, while the static snapshot mode is perfect for publications and reports.
 
 ---
 
