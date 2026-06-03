@@ -75,15 +75,46 @@ plot_krona <- function(df, root_label = "Total", interactive = TRUE, file = NULL
       root_name = root_label,
       ...
     )
+    return(p)
   } else {
-    p <- KronaR::kronar_snapshot(
-      df = df_levels,
-      file = file,
-      count_col = "Count",
-      root_name = root_label,
-      ...
-    )
-  }
+    # Generate static snapshot
+    if (is.null(file)) {
+      file <- tempfile(fileext = ".png")
+    }
 
-  return(p)
+    snap_path <- tryCatch({
+      KronaR::kronar_snapshot(
+        df = df_levels,
+        file = file,
+        count_col = "Count",
+        root_name = root_label,
+        ...
+      )
+    }, error = function(e) {
+      msg <- e$message
+      if (grepl("chrome|chromium|google-chrome", tolower(msg))) {
+        stop(paste0(
+          "Chrome/Chromium executable not found. The 'webshot2' package requires a Chromium-based browser to take snapshots.\n",
+          "Please install Google Chrome or Chromium on your system:\n",
+          "  - Ubuntu/Debian: sudo apt-get update && sudo apt-get install -y chromium-browser\n",
+          "  - macOS: brew install --cask google-chrome\n",
+          "  - Windows: Install Google Chrome\n",
+          "Original error: ", msg
+        ), call. = FALSE)
+      } else {
+        stop(e)
+      }
+    })
+
+    # Read and plot the PNG to the current graphics device
+    if (requireNamespace("png", quietly = TRUE)) {
+      img <- png::readPNG(snap_path)
+      grid::grid.newpage()
+      grid::grid.raster(img)
+    } else {
+      warning("The 'png' package is not installed. Unable to render the snapshot to the Plots pane.")
+    }
+
+    return(invisible(snap_path))
+  }
 }
