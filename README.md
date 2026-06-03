@@ -80,6 +80,32 @@ Las columnas devueltas en el `data.frame` corresponden a los resultados del moto
 - `final_code`: Código taxonómico jerárquico asignado (ej. `1.3.1.8.12.1`).
 - `best_hit_code`: Código taxonómico jerárquico del mejor hit.
 
+### 4. Obtener Tabla de Códigos de Referencia (`get_code_table`)
+
+Puedes importar la tabla completa de códigos taxonómicos de referencia jerárquicos desde la base de datos DuckDB de cualquier género:
+
+```R
+# Obtener la tabla reducida (solo sample y códigos de niveles L_0 a L_5)
+tabla_codigos <- get_code_table("test_data/Serratia.db", full_table = FALSE)
+print(head(tabla_codigos))
+```
+
+El data.frame devuelto tiene la clase personalizada `btx_code`, lo que permite identificarlo fácilmente en flujos analíticos.
+
+### 5. Graficar Gráfico Interactivo Sunburst (`plot_sunburst`)
+
+Puedes visualizar de forma interactiva la frecuencia y distribución jerárquica de las clasificaciones taxonómicas (ya sean referencias obtenidas con `get_code_table` o resultados de clasificación obtenidos con `classify`):
+
+```R
+# Graficar el sunburst interactivo usando Plotly
+grafico <- plot_sunburst(tabla_codigos, root_label = "Serratia")
+
+# Renderizar el gráfico interactivo en RStudio o tu navegador
+grafico
+```
+
+El gráfico sunburst resultante permite navegar de forma interactiva haciendo clic en los sectores jerárquicos internos para explorar sub-niveles y ver las proporciones y abundancias correspondientes.
+
 ---
 
 ## Licencia
