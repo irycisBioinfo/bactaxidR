@@ -5,13 +5,14 @@
 #'
 #' @param df A data.frame of class `btx_code` (from `get_code_table()`) or `btx_cls` (from `classify()`).
 #' @param root_label Character. Label for the center/root node of the diagram. Defaults to `"Total"`.
+#' @param show_labels Logical. If `TRUE` (default), displays text labels on the circles.
 #' @param ... Additional arguments passed to `ggraph::ggraph()`.
 #' @return A `ggplot` object displaying the circle packing diagram.
 #' @export
 #' @importFrom igraph graph_from_data_frame
-#' @importFrom ggraph ggraph geom_node_circle
+#' @importFrom ggraph ggraph geom_node_circle geom_node_text
 #' @importFrom ggplot2 theme aes theme_void
-plot_circle_packing <- function(df, root_label = "Total", ...) {
+plot_circle_packing <- function(df, root_label = "Total", show_labels = TRUE, ...) {
   if (missing(df) || !is.data.frame(df)) {
     stop("Must specify a valid data.frame ('df').")
   }
@@ -123,7 +124,13 @@ plot_circle_packing <- function(df, root_label = "Total", ...) {
 
   # Render layout with ggraph
   p <- ggraph::ggraph(g, layout = "circlepack", weight = size, ...) +
-    ggraph::geom_node_circle(ggplot2::aes(fill = depth), color = "black", linewidth = 0.2) +
+    ggraph::geom_node_circle(ggplot2::aes(fill = depth), color = "black", linewidth = 0.2)
+
+  if (show_labels) {
+    p <- p + ggraph::geom_node_text(ggplot2::aes(label = label), repel = TRUE)
+  }
+
+  p <- p +
     ggplot2::theme_void() +
     ggplot2::theme(legend.position = "right")
 

@@ -4,12 +4,14 @@
 \alias{plot_circle_packing}
 \title{Plot hierarchical circle packing diagram of taxonomic classifications using ggraph}
 \usage{
-plot_circle_packing(df, root_label = "Total", ...)
+plot_circle_packing(df, root_label = "Total", show_labels = TRUE, ...)
 }
 \arguments{
 \item{df}{A data.frame of class `btx_code` (from `get_code_table()`) or `btx_cls` (from `classify()`).}
 
 \item{root_label}{Character. Label for the center/root node of the diagram. Defaults to `"Total"`.}
+
+\item{show_labels}{Logical. If `TRUE` (default), displays text labels on the circles.}
 
 \item{...}{Additional arguments passed to `ggraph::ggraph()`.}
 }

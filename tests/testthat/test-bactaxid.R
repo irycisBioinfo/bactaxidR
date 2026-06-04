@@ -160,6 +160,29 @@ test_that("plot_circle_packing validates input and creates ggraph plot", {
   expect_error(plot_circle_packing(NULL), "Must specify a valid data.frame")
   expect_error(plot_circle_packing(data.frame(x = 1)), "Input data.frame must contain columns ending in")
 
+  # Setup mock data frame for testing show_labels and layout behavior
+  mock_cls <- data.frame(
+    query_id = c("seq1", "seq2"),
+    final_code = c("1.4.1.0.0.0", "1.1.1.4.0.0"),
+    stringsAsFactors = FALSE
+  )
+  class(mock_cls) <- c("btx_cls", "data.frame")
+
+  p_with_labels <- plot_circle_packing(mock_cls, show_labels = TRUE)
+  p_no_labels <- plot_circle_packing(mock_cls, show_labels = FALSE)
+
+  expect_s3_class(p_with_labels, "ggraph")
+  expect_s3_class(p_with_labels, "ggplot")
+  expect_s3_class(p_no_labels, "ggraph")
+  expect_s3_class(p_no_labels, "ggplot")
+
+  # Verify layer presence (GeomTextRepel should be present with show_labels = TRUE)
+  has_text_repel <- function(plot_obj) {
+    any(sapply(plot_obj$layers, function(l) inherits(l$geom, "GeomTextRepel")))
+  }
+  expect_true(has_text_repel(p_with_labels))
+  expect_false(has_text_repel(p_no_labels))
+
   serratia_db <- testthat::test_path("../../test_data/Serratia.db")
   if (file.exists(serratia_db)) {
     # Test plotting from btx_code
@@ -167,17 +190,6 @@ test_that("plot_circle_packing validates input and creates ggraph plot", {
     p_code <- plot_circle_packing(df_reduced)
     expect_s3_class(p_code, "ggraph")
     expect_s3_class(p_code, "ggplot")
-
-    # Test plotting from btx_cls (using mock data frame)
-    mock_cls <- data.frame(
-      query_id = c("seq1", "seq2"),
-      final_code = c("1.4.1.0.0.0", "1.1.1.4.0.0"),
-      stringsAsFactors = FALSE
-    )
-    class(mock_cls) <- c("btx_cls", "data.frame")
-    p_cls <- plot_circle_packing(mock_cls)
-    expect_s3_class(p_cls, "ggraph")
-    expect_s3_class(p_cls, "ggplot")
   }
 })
 
