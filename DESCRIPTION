@@ -18,7 +18,8 @@ Imports:
     duckdb,
     DBI,
     KronaR,
-    sunburstR
+    sunburstR,
+    plotly
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
@@ -30,6 +31,7 @@ Collate:
     'get_code_table.R'
     'plot_krona.R'
     'plot_sunburst.R'
+    'plot_sunburst_plotly.R'
 Remotes:
     irycisBioinfo/KronaR
 

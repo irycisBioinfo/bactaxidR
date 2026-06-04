@@ -9,6 +9,7 @@ The package includes:
 - A `get_code_table` function to import the reference classification table from DuckDB database files, returning an R `data.frame` of S3 class `btx_code`.
 - A `plot_krona` function to generate an interactive Krona chart (iframe) or a static PNG snapshot representing the hierarchical structure and frequencies of taxonomic codes from either database references or classification outputs using `KronaR`.
 - A `plot_sunburst` function to generate an interactive sunburst chart representing the hierarchical structure and frequencies of taxonomic codes from either database references or classification outputs using `sunburstR`.
+- A `plot_sunburst_plotly` function to generate an interactive sunburst chart representing the hierarchical structure and frequencies of taxonomic codes from either database references or classification outputs using `plotly`.
 
 ---
 
@@ -147,6 +148,20 @@ You can visualize the frequency and hierarchical distribution of taxonomic class
 fig <- plot_sunburst(code_table, root_label = "Serratia")
 
 # Render the interactive widget in RStudio or your web browser
+fig
+```
+
+---
+
+### 7. Plot Interactive Sunburst Chart with Plotly (`plot_sunburst_plotly`)
+
+You can visualize the frequency and hierarchical distribution of taxonomic classifications (either reference tables from `get_code_table` or classification outputs from `classify`) using Plotly:
+
+```R
+# Plot the interactive sunburst using Plotly
+fig <- plot_sunburst_plotly(code_table, root_label = "Serratia")
+
+# Render the interactive plot in RStudio or your web browser
 fig
 ```
 

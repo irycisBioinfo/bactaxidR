@@ -131,3 +131,28 @@ test_that("plot_sunburst validates input and creates sunburst widget", {
   }
 })
 
+test_that("plot_sunburst_plotly validates input and creates plotly widget", {
+  expect_error(plot_sunburst_plotly(NULL), "Must specify a valid data.frame")
+  expect_error(plot_sunburst_plotly(data.frame(x = 1)), "Input data.frame must contain columns ending in")
+
+  serratia_db <- testthat::test_path("../../test_data/Serratia.db")
+  if (file.exists(serratia_db)) {
+    # Test plotting from btx_code
+    df_reduced <- get_code_table(serratia_db, full_table = FALSE)
+    p_code <- plot_sunburst_plotly(df_reduced)
+    expect_s3_class(p_code, "plotly")
+    expect_s3_class(p_code, "htmlwidget")
+
+    # Test plotting from btx_cls (using mock data frame)
+    mock_cls <- data.frame(
+      query_id = c("seq1", "seq2"),
+      final_code = c("1.4.1.0.0.0", "1.1.1.4.0.0"),
+      stringsAsFactors = FALSE
+    )
+    class(mock_cls) <- c("btx_cls", "data.frame")
+    p_cls <- plot_sunburst_plotly(mock_cls)
+    expect_s3_class(p_cls, "plotly")
+    expect_s3_class(p_cls, "htmlwidget")
+  }
+})
+
