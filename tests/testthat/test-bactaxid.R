@@ -156,3 +156,28 @@ test_that("plot_sunburst_plotly validates input and creates plotly widget", {
   }
 })
 
+test_that("plot_circle_packing validates input and creates ggraph plot", {
+  expect_error(plot_circle_packing(NULL), "Must specify a valid data.frame")
+  expect_error(plot_circle_packing(data.frame(x = 1)), "Input data.frame must contain columns ending in")
+
+  serratia_db <- testthat::test_path("../../test_data/Serratia.db")
+  if (file.exists(serratia_db)) {
+    # Test plotting from btx_code
+    df_reduced <- get_code_table(serratia_db, full_table = FALSE)
+    p_code <- plot_circle_packing(df_reduced)
+    expect_s3_class(p_code, "ggraph")
+    expect_s3_class(p_code, "ggplot")
+
+    # Test plotting from btx_cls (using mock data frame)
+    mock_cls <- data.frame(
+      query_id = c("seq1", "seq2"),
+      final_code = c("1.4.1.0.0.0", "1.1.1.4.0.0"),
+      stringsAsFactors = FALSE
+    )
+    class(mock_cls) <- c("btx_cls", "data.frame")
+    p_cls <- plot_circle_packing(mock_cls)
+    expect_s3_class(p_cls, "ggraph")
+    expect_s3_class(p_cls, "ggplot")
+  }
+})
+

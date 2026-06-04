@@ -19,7 +19,10 @@ Imports:
     DBI,
     KronaR,
     sunburstR,
-    plotly
+    plotly,
+    ggraph,
+    igraph,
+    ggplot2
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
@@ -32,6 +35,7 @@ Collate:
     'plot_krona.R'
     'plot_sunburst.R'
     'plot_sunburst_plotly.R'
+    'plot_circle_packing.R'
 Remotes:
     irycisBioinfo/KronaR
 

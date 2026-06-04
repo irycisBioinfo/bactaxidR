@@ -10,6 +10,7 @@ The package includes:
 - A `plot_krona` function to generate an interactive Krona chart (iframe) or a static PNG snapshot representing the hierarchical structure and frequencies of taxonomic codes from either database references or classification outputs using `KronaR`.
 - A `plot_sunburst` function to generate an interactive sunburst chart representing the hierarchical structure and frequencies of taxonomic codes from either database references or classification outputs using `sunburstR`.
 - A `plot_sunburst_plotly` function to generate an interactive sunburst chart representing the hierarchical structure and frequencies of taxonomic codes from either database references or classification outputs using `plotly`.
+- A `plot_circle_packing` function to generate a static circle packing diagram representing the hierarchical structure and frequencies of taxonomic codes from either database references or classification outputs using `ggraph`.
 
 ---
 
@@ -163,6 +164,20 @@ fig <- plot_sunburst_plotly(code_table, root_label = "Serratia")
 
 # Render the interactive plot in RStudio or your web browser
 fig
+```
+
+---
+
+### 8. Plot Static Circle Packing Diagram (`plot_circle_packing`)
+
+You can visualize the frequency and hierarchical distribution of taxonomic classifications (either reference tables from `get_code_table` or classification outputs from `classify`) using a circle packing diagram generated with `ggraph`:
+
+```R
+# Plot the static circle packing diagram
+fig <- plot_circle_packing(code_table, root_label = "Serratia")
+
+# Render the static plot in RStudio Plots or your document
+print(fig)
 ```
 
 ---
