@@ -8,6 +8,7 @@ The package includes:
 - A `classify` function to perform taxonomic classification on a set of FASTA files interactively or non-interactively, returning a structured R `data.frame` of S3 class `btx_cls`.
 - A `get_code_table` function to import the reference classification table from DuckDB database files, returning an R `data.frame` of S3 class `btx_code`.
 - A `plot_krona` function to generate an interactive Krona chart (iframe) or a static PNG snapshot representing the hierarchical structure and frequencies of taxonomic codes from either database references or classification outputs using `KronaR`.
+- A `plot_sunburst` function to generate an interactive sunburst chart representing the hierarchical structure and frequencies of taxonomic codes from either database references or classification outputs using `sunburstR`.
 
 ---
 
@@ -134,6 +135,20 @@ message("Snapshot saved to: ", png_path)
 ```
 
 The resulting interactive chart allows you to dynamically zoom, query, and explore the classification hierarchy, while the static snapshot mode is perfect for publications and reports.
+
+---
+
+### 6. Plot Interactive Sunburst Chart (`plot_sunburst`)
+
+You can visualize the frequency and hierarchical distribution of taxonomic classifications (either reference tables from `get_code_table` or classification outputs from `classify`) using the `sunburstR` htmlwidget:
+
+```R
+# Plot the interactive sunburst using sunburstR
+fig <- plot_sunburst(code_table, root_label = "Serratia")
+
+# Render the interactive widget in RStudio or your web browser
+fig
+```
 
 ---
 
